@@ -3,8 +3,8 @@ import java.util.ArrayList;
 
 public class GraphNode implements GNode{
 
-	String name;
-	ArrayList children = new ArrayList();
+	private String name;
+	private ArrayList children = new ArrayList();
 	boolean visited;
 
 	public GraphNode(String n){
@@ -68,19 +68,17 @@ public class GraphNode implements GNode{
 	public ArrayList paths(GNode node) {
 		ArrayList tempList = new ArrayList();
 		GraphNode currentnode = (GraphNode) node;
+		String currentpath = new String(); 
 				
 		if (currentnode.getChildren().length > 0){
 			for (int x=0; x < currentnode.getChildren().length; x++){
-				ArrayList innerList = new ArrayList();
-				if (currentnode.getChildren()[x].getChildren().length > 0)
-					for (int y=0; y < currentnode.getChildren().length; y++){
-						
-						innerList.add(currentnode.getChildren()[y]);
-						
-					}
-				tempList.add(innerList);
+				currentnode.paths(currentnode.getChildren()[x]);
 			}
+			
+			tempList.add(currentpath) ;
 		}
+		else
+			currentpath += currentnode.getName();
 	
 		
 		return tempList;
