@@ -26,11 +26,12 @@ public class GraphTest {
 			System.out.print(((GNode) graph.get(i)).getName() + " ");
 		
 		System.out.println("\n\nPath list from node: " + A.getName());
+		//for (int j=0; j< path.size(); j++)
+			//for (int k=0; k< path.size(); k++)
+			//System.out.print(((GNode) ( (ArrayList) path.get(j)).get(k)).getName() + " ");
 		for (int j=0; j< path.size(); j++)
-			for (int k=0; k< path.size(); k++)
-			System.out.print(((GNode) ((ArrayList) path.get(j)).get(k)).getName() + " ");
+			System.out.print(path.get(j) + " ");
 
 	}
 
 }
-
