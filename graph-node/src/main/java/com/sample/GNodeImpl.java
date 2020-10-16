@@ -1,7 +1,11 @@
 package com.sample;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GNodeImpl implements GNode {
 
@@ -22,60 +26,44 @@ public class GNodeImpl implements GNode {
     }
 
     @Override
-    public GNode[] getChildren() {
-        GNode[] tempNode = new GNode[children.size()];
-        for (int i = 0; i < children.size(); i++)
-            tempNode[i] = children.get(i);
-
-        return tempNode;
-    }
-
-    @Override
     public void addChild(GNode gNode) {
         children.add(gNode);
     }
 
     @Override
-    public ArrayList<GNodeImpl> walkGraph(GNode gNode) {
-        ArrayList<GNode> childList = new ArrayList<>();
-        childList.add(gNode);
-
-        ArrayList<GNodeImpl> tempList = new ArrayList<>();
-        while (!childList.isEmpty()) {
-
-            GNodeImpl currentnode = (GNodeImpl) childList.remove(0);
-
-            if (!tempList.contains(currentnode)) {
-                tempList.add(currentnode);
-            }
-
-            if (currentnode.getChildren().length > 0) {
-
-                for (int i = 0; i < currentnode.getChildren().length; i++) {
-
-                    if (!childList.contains(currentnode.getChildren()[i])) {
-                        childList.add(currentnode.getChildren()[i]);
-                    }
-                }
-            }
-        }
-        return tempList;
+    public GNode[] getChildren() {
+        return children.toArray(new GNode[0]);
     }
 
     @Override
-    public ArrayList paths(GNode gNode) {
+    public ArrayList<GNode> walkGraph(GNode gNode) {
+        Collection<GNode> visitedNodes = new ArrayList<>();
+        List<GNode> notVisitedNodes = new ArrayList<>(Collections.singletonList(gNode));
+
+        while (!notVisitedNodes.isEmpty()) {
+            List<GNode> newNodes =
+                    (ArrayList<GNode>) notVisitedNodes.stream().map(GNode::getChildren).flatMap(Arrays::stream)
+                                                      .filter(node -> !visitedNodes.contains(node))
+                                                      .collect(Collectors.toList());
+
+            visitedNodes.addAll(notVisitedNodes);
+            notVisitedNodes = newNodes;
+        }
+        return (ArrayList<GNode>) visitedNodes.stream().distinct().collect(Collectors.toList());
+    }
+
+    @Override
+    public ArrayList<ArrayList<GNode>> paths(GNode gNode) {
         ArrayList<ArrayList<GNode>> tempList = new ArrayList<>();
         if (gNode.getChildren().length > 0) {
             for (GNode child : gNode.getChildren()) {
                 tempList.addAll(paths(child));
             }
-            for (ArrayList<GNode> child : tempList) {
-                child.add(0, gNode);
-            }
+            tempList.forEach(child -> child.add(0, gNode));
         } else {
-            ArrayList<GNode> thisnode = new ArrayList<>();
-            thisnode.add(gNode);
-            tempList.add(thisnode);
+            ArrayList<GNode> node = new ArrayList<>();
+            node.add(gNode);
+            tempList.add(node);
         }
         return tempList;
     }
